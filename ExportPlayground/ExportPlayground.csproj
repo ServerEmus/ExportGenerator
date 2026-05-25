@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<!-- Basic -->
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Platforms>AnyCPU;x86;x64</Platforms>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<!-- To be native AOT -->
+		<IsAotCompatible>True</IsAotCompatible>
+		<PublishAot>true</PublishAot>
+		<DebuggerSupport>False</DebuggerSupport>
+		<PublishTrimmed>true</PublishTrimmed>
+		<EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+		<!-- To can check via sizoscope -->
+		<IlcGenerateMstatFile>true</IlcGenerateMstatFile>
+		<IlcGenerateDgmlFile>true</IlcGenerateDgmlFile>
+		<!-- trim related -->
+		<TrimmerSingleWarn>false</TrimmerSingleWarn>
+		<!-- Debug stuff remove -->
+		<DebuggerSupport>false</DebuggerSupport>
+		<DebugType>none</DebugType>
+		<IncludeSymbols>false</IncludeSymbols>
+		<TrimmerRemoveSymbols>true</TrimmerRemoveSymbols>
+		<UseSystemResourceKeys>true</UseSystemResourceKeys>
+		<IlcStripSymbols>true</IlcStripSymbols>
+		<!-- Size optimalization -->
+		<OptimizationPreference>Size</OptimizationPreference>
+		<InvariantGlobalization>true</InvariantGlobalization>
+		<StackTraceSupport>false</StackTraceSupport>
+		<SatelliteResourceLanguages></SatelliteResourceLanguages>
+		<Optimize>true</Optimize>
+		<EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+		<EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
+		<EventSourceSupport>false</EventSourceSupport>
+		<HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
+		<MetadataUpdaterSupport>false</MetadataUpdaterSupport>
+		<MetricsSupport>false</MetricsSupport>
+		<XmlResolverIsNetworkingEnabledByDefault>false</XmlResolverIsNetworkingEnabledByDefault>
+		<DynamicCodeSupport>false</DynamicCodeSupport>
+	</PropertyGroup>
+
+	<!--  -->
+	<ItemGroup>
+		<ProjectReference Include="..\ExportGenerator\ExportGenerator.csproj">
+			<OutputItemType>Analyzer</OutputItemType>
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+		</ProjectReference>
+	</ItemGroup>
+	<!-- -->
+	
+	<!-- static link .dll dependency -->
+	<!-- 
+	<ItemGroup>
+		<DirectPInvoke Include="Dependency" />
+		<NativeLibrary Include="Dependency.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+		<NativeLibrary Include="Dependency.a" Condition="!$(RuntimeIdentifier.StartsWith('win'))" />
+	</ItemGroup>
+	-->
+	
+</Project>

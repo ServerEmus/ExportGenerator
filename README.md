@@ -1,2 +1,1 @@
-# ExportGenerator
-Creates easy C# export with Attributes
+# Export Generator

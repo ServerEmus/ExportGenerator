@@ -1,0 +1,17 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="ExportGenCppTester/ExportGenCppTester.vcxproj" Id="1c0303aa-7d6f-4e5b-8a3e-4c136cf13f2a" />
+  <Project Path="ExportGenerator.Test/ExportGenerator.Test.csproj" />
+  <Project Path="ExportGenerator/ExportGenerator.csproj" />
+  <Project Path="ExportPlayground/ExportPlayground.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+</Solution>
