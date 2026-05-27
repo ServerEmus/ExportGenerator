@@ -1,4 +1,7 @@
-﻿namespace ExportPlayground;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+namespace ExportPlayground;
 
 [ExportGenVTable]
 internal interface ITestV1
@@ -19,12 +22,9 @@ internal interface ITestV2
 
 public partial struct StructTest : ITestV1
 {
-	public int Version() => throw new NotImplementedException();
+	public readonly int Version() => 1;
 
-	public void Test()
-	{
-		throw new NotImplementedException();
-	}
+	public readonly void Test() { }
 
 	public static StructTest CreateSturct()
 	{
@@ -32,7 +32,7 @@ public partial struct StructTest : ITestV1
 	}
 }
 
-[ExportGen("ITest")]
+[ExportGen("ITest", exportPublicMethods: true, useVTable: false)]
 public partial class Test(int @version) : ITestV1, ITestV2
 {
 	private readonly int _version = @version;
@@ -80,25 +80,7 @@ public partial class Test
 {
 	public const int GeneratedHash = 254345;
 
-	public enum ExportCustomFunctions
-	{
-		Version,
-		ITestV1_Test,
-		ITestV2_Test,
-		Test2,
-		MAX
-	}
-
 	private static readonly Dictionary<IntPtr, Test> PointerToCreatedClass = [];
-	private static readonly nint[] FunctionPointers = new nint[(int)ExportCustomFunctions.MAX];
-
-	static Test()
-	{
-		unsafe
-		{
-			// FunctionPointers[(int)ExportCustomFunctions.Version] = (nint)(delegate* unmanaged /*[Cdecl] */<nint, void>)&EXPORT_Start;
-		}
-	}
 
 	[UnmanagedCallersOnly(EntryPoint = "Test_Create", CallConvs = [typeof(CallConvCdecl)])]
 	public static IntPtr EXPORT_Test_Create(int version)

@@ -21,11 +21,10 @@ public class HelperClassGenerator : IIncrementalGenerator
 			/// <typeparam name="T">Any unmanaged type.</typeparam>
 			/// <param name="unmanaged_t">The unmanaged object.</param>
 			/// <returns>The pointer to the object.</returns>
-			public static unsafe nint ToIntPtr<T>(this T unmanaged_t) where T : unmanaged
+			public static IntPtr ToIntPtr<T>(this T unmanaged_t) where T : unmanaged
 			{
-				nint allocatedPointer = Marshal.AllocHGlobal(sizeof(T));
-				T* typeTPointer = (T*)allocatedPointer;
-				*typeTPointer = unmanaged_t;
+				IntPtr allocatedPointer = Marshal.AllocHGlobal(Marshal.SizeOf<T>());
+				Marshal.StructureToPtr(unmanaged_t, allocatedPointer, false);
 				return allocatedPointer;
 			}
 		}
