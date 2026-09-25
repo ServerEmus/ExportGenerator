@@ -21,7 +21,7 @@ public class AttributesGenerator : IIncrementalGenerator
         /// <param name="useVTable">Whenever should create VTable for the target.</param>
         /// <param name="convention">The calling convention to use.</param>
         [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]
-        public class ExportGen(string exportBaseName = "", bool exportPublicMethods = true, bool useVTable = true, CallingConvention convention = CallingConvention.Cdecl) : Attribute
+        public class ExportGen(string exportBaseName, bool exportPublicMethods = true, bool useVTable = true, CallingConvention convention = CallingConvention.Cdecl) : Attribute
         {
         	public string ExportBaseName { get; } = exportBaseName;
         	public bool ExportPublicMethods { get; } = exportPublicMethods;
@@ -39,10 +39,7 @@ public class AttributesGenerator : IIncrementalGenerator
         /// ExportName and ExportBaseName will look like: ExportBaseName_ExportName.
         /// </remarks>
         [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-        public class ExportGenCreate(string exportName = "Create", CallingConvention convention = CallingConvention.Cdecl, bool includeBaseName = true, string exportBaseName = "") : ExportGenMethod(exportName, convention, includeBaseName)
-        {
-        	public string ExportBaseName { get; } = exportBaseName;
-        }
+        public class ExportGenCreate(string exportName = "Create", CallingConvention convention = CallingConvention.Cdecl, bool includeBaseName = true) : ExportGenMethod(exportName, convention, includeBaseName);
 
         /// <summary>
         /// Indicate the target has this method as free (clearing the memory).
@@ -54,10 +51,7 @@ public class AttributesGenerator : IIncrementalGenerator
         /// ExportName and ExportBaseName will look like: ExportBaseName_ExportName.
         /// </remarks>
         [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-        public class ExportGenFree(string exportName = "Free", CallingConvention convention = CallingConvention.Cdecl, bool includeBaseName = true, string exportBaseName = "") : ExportGenMethod(exportName, convention, includeBaseName)
-        {
-        	public string ExportBaseName { get; } = exportBaseName;
-        }
+        public class ExportGenFree(string exportName = "Free", CallingConvention convention = CallingConvention.Cdecl, bool includeBaseName = true) : ExportGenMethod(exportName, convention, includeBaseName);
 
         /// <summary>
         /// Indicate the method should generate a dllexport entry point.
@@ -95,10 +89,7 @@ public class AttributesGenerator : IIncrementalGenerator
         /// Indicate the target should generate a vtable.
         /// </summary>
         [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-        public class ExportGenVTableCreate(string createMethodName = "") : Attribute
-        {
-        	public string CreateMethodName { get; } = createMethodName;
-        }
+        public class ExportGenVTableCreate() : Attribute;
         """;
 
 	public void Initialize(IncrementalGeneratorInitializationContext context)

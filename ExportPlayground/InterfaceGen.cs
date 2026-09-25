@@ -20,18 +20,6 @@ internal interface ITestV2
 	public void Test2();
 }
 
-public partial struct StructTest : ITestV1
-{
-	public readonly int Version() => 1;
-
-	public readonly void Test() { }
-
-	public static StructTest CreateSturct()
-	{
-		return new();
-	}
-}
-
 [ExportGen("ITest", exportPublicMethods: true, useVTable: false)]
 public partial class Test(int @version) : ITestV1, ITestV2
 {
@@ -44,33 +32,68 @@ public partial class Test(int @version) : ITestV1, ITestV2
 		Console.WriteLine("test2 call");
 	}
 
+	[ExportGenMethod("Test")]
 	void ITestV1.Test()
 	{
 		Console.WriteLine("v1 test call");
 	}
 
+	[ExportGenMethod("TestV2")]
 	void ITestV2.Test()
 	{
 		Console.WriteLine("v2 test call");
 	}
 
-	[ExportGenCreate("Create")]
+	public void ArgTest(int arg1)
+	{
+
+	}
+
+	public void Arg2(int arg1, int arg2, int arg3)
+	{
+
+	}
+
+	[ExportGenCreate]
 	public static Test CreateTest(int version)
 	{
 		return new Test(version);
 	}
 
-	[ExportGenVTableCreate(nameof(CreateTest))]
-	public static IntPtr CreateVTable(int version)
+	[ExportGenVTableCreate]
+	public static unsafe IntPtr CreateVTable(ref Test test, int version)
 	{
 		switch (version)
 		{
 			default:
 				break;
 			case 1:
-				return IntPtr.Zero;
+				return new VTables.ITestV1_VTable()
+				{ 
+					Version = (nint)(delegate* unmanaged<nint, int>)&EXPORT_ITest_Version,
+					Test = (nint)(delegate* unmanaged<nint, void>)&EXPORT_ITest_Test,
+				}.ToIntPtr();
+			case 2:
+				return new VTables.ITestV2_VTable()
+				{
+					Version = (nint)(delegate* unmanaged<nint, int>)&EXPORT_ITest_Version,
+					Test = (nint)(delegate* unmanaged<nint, void>)&EXPORT_ITest_TestV2,
+					Test2 = (nint)(delegate* unmanaged<nint, void>)&EXPORT_ITest_Test2,
+				}.ToIntPtr();
 		}
 		return IntPtr.Zero;
+	}
+
+	[ExportGenFree]
+	public static void Free(ref Test test)
+	{
+
+	}
+
+	[ExportGenIgnore]
+	public void Balls()
+	{
+
 	}
 }
 

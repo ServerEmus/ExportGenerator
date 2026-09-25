@@ -5,4 +5,3 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
-EXGEN001  | ExportGen |  Error | ExportGen VTable off with no VTable creation

@@ -20,15 +20,15 @@ public class StructsGenerator : IIncrementalGenerator
 		public struct CustomVTable
 		{
 
-		/// <summary>
-		/// The pointer to the real vtable.
-		/// </summary>
-		public nint VTablePointer;
+			/// <summary>
+			/// The pointer to the real vtable.
+			/// </summary>
+			public nint VTablePointer;
 
-		/// <summary>
-		/// Hash of the generated object.
-		/// </summary>
-		public int Hash;
+			/// <summary>
+			/// Hash of the generated object.
+			/// </summary>
+			public int Hash;
 
 		}
 		""";

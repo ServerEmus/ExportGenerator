@@ -84,7 +84,7 @@ public class ExportGenGenerator : IIncrementalGenerator
 
 			generated.MethodsToExport.Add(new()
 			{ 
-				Attribute = attribute,
+				ExportGenAttribute = attribute,
 				MethodSymbol = method,
 			});
 		}
@@ -116,14 +116,14 @@ public class ExportGenGenerator : IIncrementalGenerator
 						m = new()
 						{
 							MethodSymbol = classMethodImplementation,
-							Attribute = attribute
+							ExportGenAttribute = attribute
 						};
 
 						generated.MethodsToExport.Add(m);
 						continue;
 					}
 
-					m.Attribute ??= attribute;
+					m.ExportGenAttribute ??= attribute;
 				}
 			}
 		}
@@ -150,6 +150,7 @@ public class ExportGenGenerator : IIncrementalGenerator
 
 			using System;
 			using System.Collections.Generic;
+			using System.Collections.Concurrent;
 			using System.Runtime.CompilerServices;
 			using System.Runtime.InteropServices;
 
@@ -166,24 +167,39 @@ public class ExportGenGenerator : IIncrementalGenerator
 					{{source.Symbol.DeclaredAccessibility.ToString().ToLower()}} partial {{(source.Symbol.IsValueType ? "struct" : "class")}} {{source.Symbol.Name}}
 					{
 						public const int GeneratedHash = {{Helpers.GetStableHashCode($"{Helpers.GetNameSpace(source.Symbol)}.{source.Symbol.Name}")}};
-						private static readonly Dictionary<IntPtr, {{source.Symbol.Name}}> PointerToCreatedClass = [];
+						private static readonly ConcurrentDictionary<IntPtr, {{source.Symbol.Name}}> PointerToCreatedClass = [];
 					""");
 
 		if (source.UseVTable)
 		{
-			sb.AppendLine("private static readonly nint[] FunctionPointers = new nint[(int)ExportCustomFunctions.MAX];");
+			sb.AppendLine("\tprivate static readonly nint[] FunctionPointers = new nint[(int)ExportCustomFunctions.MAX];");
 			Helpers.GenerateVTable(source.Symbol, source.MethodsToExport, sb);
-			GenerateEnum(@namespace, source.MethodsToExport, sb);
-			// generate static and fill function pointers.
+			var enums = GenerateEnum(@namespace, source.MethodsToExport, sb);
+			GenerateStatic(context, source.ExportBaseName, @namespace, source.MethodsToExport, sb, enums, source.Symbol.Name);
 		}
 
+		foreach (var item in source.MethodsToExport)
+		{
+
+			if (item.MethodSymbol.MethodKind == MethodKind.ExplicitInterfaceImplementation && !item.MethodSymbol.TryGetAttribute("ExportGenMethod", out _))
+			{
+				context.ReportDiagnostic(Diagnostic.Create(Diagnostics.ExportMethodInterfaceImpNeedAttribute, item.MethodSymbol.Locations[0], [item.MethodSymbol.Name]));
+				return;
+			}
+
+			new GenerateExportedClass(source.ExportBaseName, context, sb, item).Generate();
+		}
+
+		if (source.CustomCreate != null)
+			new GenerateExportedClass(source.ExportBaseName, context, sb, source.CustomCreate).GenerateCreate(source.CustomVTableCreator);
+
+		if (source.CustomFree != null)
+			new GenerateExportedClass(source.ExportBaseName, context, sb, source.CustomFree).GenerateFree();
 
 
 		sb.AppendLine("}");
 
 		context.AddSource($"{source.Symbol.Name}_ExportGen.g.cs", sb.ToString());
-
-
 	}
 
 	public class Generated
@@ -198,26 +214,14 @@ public class ExportGenGenerator : IIncrementalGenerator
 		public object? something = null;
 	}
 
-	public static void GenerateEnum(string @namespace, List<MethodExport> methods, StringBuilder sb)
+	public static List<string> GenerateEnum(string @namespace, List<MethodExport> methods, StringBuilder sb)
 	{
 		List<string> methodNames = [];
 		methodNames.Clear();
 
 		foreach (var method in methods)
 		{
-			string genMethodName = method.MethodSymbol.Name;
-			if (method.Attribute != null &&
-				method.Attribute.ConstructorArguments[0].Value is string str &&
-				!string.IsNullOrEmpty(str))
-			{
-				genMethodName = str;
-			}
-
-			if (genMethodName.Contains(@namespace + "."))
-				genMethodName = genMethodName.Replace(@namespace + ".", string.Empty);
-
-			if (genMethodName.Contains("."))
-				genMethodName = genMethodName.Replace(".", "_");
+			string genMethodName = method.EnumName(@namespace);
 
 			methodNames.Add(genMethodName);
 		}
@@ -230,6 +234,51 @@ public class ExportGenGenerator : IIncrementalGenerator
 						methodNames.Select(s => string.Format("\t\t{0},", s))
 					)}}
 							MAX
+						}
+					""");
+
+		return methodNames;
+	}
+
+	public static void GenerateStatic(SourceProductionContext context, string ExportBaseName, string @namespace, List<MethodExport> methods, StringBuilder sb, List<string> enumNames, string name)
+	{
+		StringBuilder unsafeBuilder = new();
+
+		foreach (var method in methods)
+		{
+			unsafeBuilder.Append($"\n\t\t\tFunctionPointers[(int)ExportCustomFunctions.{method.EnumName(@namespace)}] = (nint)(delegate* unmanaged ");
+			var ex = new GenerateExportedClass(ExportBaseName, context, unsafeBuilder, method);
+			ex.WriteCallConv();
+			unsafeBuilder.Append("<");
+			ex.WriteArgument();
+			unsafeBuilder.Append(">)&");
+			ex.WriteExportName(true);
+			unsafeBuilder.Append(";");
+		}
+
+
+		string vtableFill = string.Empty;
+		foreach (var item in enumNames)
+		{
+			vtableFill += $"\n\t\t\t{item} = FunctionPointers[(int)ExportCustomFunctions.{item}],";
+		}
+
+
+		sb.AppendLine(
+					$$"""
+						private static {{name}}_VTable _vtable;
+
+						static {{name}}()
+						{
+							unsafe 
+							{
+						{{unsafeBuilder}}
+							}
+
+							_vtable = new()
+							{
+						{{vtableFill}}
+							};
 						}
 					""");
 	}

@@ -56,7 +56,7 @@ public class ExportGenVTableGenerator : IIncrementalGenerator
 			generated.Methods.Add(new()
 			{ 
 				MethodSymbol = method,
-				Attribute = attribute
+				ExportGenAttribute = attribute
 
 			});
 		}
@@ -73,7 +73,7 @@ public class ExportGenVTableGenerator : IIncrementalGenerator
 		Helpers.GenerateVTable(source.Symbol, source.Methods, sb);
 		string src = SourceCode.Replace("__BODY__", sb.ToString());
 
-		context.AddSource($"{source.Symbol.Name}_vtable.g.cs", src);
+		context.AddSource($"{source.Symbol.Name}_VTable.g.cs", src);
 	}
 
 	public class Generated

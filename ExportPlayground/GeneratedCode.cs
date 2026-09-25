@@ -8,11 +8,15 @@ namespace ExportPlayground;
 /// Indicate the target should generate a dllexport entry point.
 /// </summary>
 /// <param name="exportBaseName">The base name to export this class.</param>
+/// <param name="exportPublicMethods">Whenever should export public methods or declare by ExportGenMethod.</param>
+/// <param name="useVTable">Whenever should create VTable for the target.</param>
 /// <param name="convention">The calling convention to use.</param>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]
-public class ExportGen(string exportBaseName = "", CallingConvention convention = CallingConvention.Winapi) : Attribute
+public class ExportGen(string exportBaseName = "", bool exportPublicMethods = true, bool useVTable = true, CallingConvention convention = CallingConvention.Cdecl) : Attribute
 {
 	public string ExportBaseName { get; } = exportBaseName;
+	public bool ExportPublicMethods { get; } = exportPublicMethods;
+	public bool UseVTable { get; } = useVTable;
 	public CallingConvention Convention { get; } = convention;
 }
 
@@ -26,7 +30,7 @@ public class ExportGen(string exportBaseName = "", CallingConvention convention 
 /// ExportName and ExportBaseName will look like: ExportBaseName_ExportName.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-public class ExportGenCreate(string exportName = "Create", CallingConvention convention = CallingConvention.Winapi, bool includeBaseName = true, string exportBaseName = "") : ExportGenMethod(exportName, convention, includeBaseName)
+public class ExportGenCreate(string exportName = "Create", CallingConvention convention = CallingConvention.Cdecl, bool includeBaseName = true, string exportBaseName = "") : ExportGenMethod(exportName, convention, includeBaseName)
 {
 	public string ExportBaseName { get; } = exportBaseName;
 }
@@ -41,7 +45,7 @@ public class ExportGenCreate(string exportName = "Create", CallingConvention con
 /// ExportName and ExportBaseName will look like: ExportBaseName_ExportName.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-public class ExportGenFree(string exportName = "Free", CallingConvention convention = CallingConvention.Winapi, bool includeBaseName = true, string exportBaseName = "") : ExportGenMethod(exportName, convention, includeBaseName)
+public class ExportGenFree(string exportName = "Free", CallingConvention convention = CallingConvention.Cdecl, bool includeBaseName = true, string exportBaseName = "") : ExportGenMethod(exportName, convention, includeBaseName)
 {
 	public string ExportBaseName { get; } = exportBaseName;
 }
@@ -56,7 +60,7 @@ public class ExportGenFree(string exportName = "Free", CallingConvention convent
 /// ExportName and ExportBaseName will look like: ExportBaseName_ExportName.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-public class ExportGenMethod(string exportName, CallingConvention convention = CallingConvention.Winapi, bool includeBaseName = true) : Attribute
+public class ExportGenMethod(string exportName, CallingConvention convention = CallingConvention.Cdecl, bool includeBaseName = true) : Attribute
 {
 	public string ExportName { get; } = exportName;
 	public CallingConvention Convention { get; } = convention;
@@ -82,7 +86,10 @@ public class ExportGenVTable(string exportBaseName = "") : Attribute
 /// Indicate the target should generate a vtable.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-public class ExportGenVTableCreate(string createMethodName = "", params string[] vtables) : Attribute;
+public class ExportGenVTableCreate(string createMethodName = "") : Attribute
+{
+	public string CreateMethodName { get; } = createMethodName;
+}
 
 /// <summary>
 /// Custom virtual table.

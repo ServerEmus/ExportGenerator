@@ -71,8 +71,8 @@ internal static class Helpers
 		foreach (var method in methods)
 		{
 			string genMethodName = method.MethodSymbol.Name;
-			if (method.Attribute != null &&
-				method.Attribute.ConstructorArguments[0].Value is string str &&
+			if (method.ExportGenAttribute != null &&
+				method.ExportGenAttribute.ConstructorArguments[0].Value is string str &&
 				!string.IsNullOrEmpty(str))
 			{
 				genMethodName = str;
@@ -91,7 +91,7 @@ internal static class Helpers
 		sb.AppendLine(
 			$$"""
 						[StructLayout(LayoutKind.Sequential, Pack = 8)]
-						public struct {{symbol.Name}}_Table
+						public struct {{symbol.Name}}_VTable
 						{
 					{{string.Join("\n",
 					methodNames.Select(s => string.Format("\t\tpublic nint {0};", s))

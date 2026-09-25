@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -7,7 +8,7 @@ using System.Text;
 namespace ExportPlayground;
 
 // Generate export with all public class, prefixed as "ExportCustom_"
-[ExportGen] 
+[ExportGen(nameof(ExportCustom))] 
 public partial class ExportCustom
 {
 	private bool isInitialied = false;
@@ -81,10 +82,9 @@ public partial class ExportCustom
 	}
 
 	[ExportGenFree]
-	public static void DestroyExportCustom(ref ExportCustom? exportCustom)
+	public static void DestroyExportCustom(ref ExportCustom exportCustom)
 	{
-		exportCustom?.Stop();
-		exportCustom = null;
+		exportCustom.Stop();
 	}
 }
 
@@ -119,7 +119,7 @@ public partial class ExportCustom
 		MAX
 	}
 
-	private static readonly Dictionary<IntPtr, ExportCustom> PointerToCreatedClass = [];
+	private static readonly ConcurrentDictionary<IntPtr, ExportCustom> PointerToCreatedClass = [];
 	private static readonly nint[] FunctionPointers = new nint[(int)ExportCustomFunctions.MAX];
 	private static ExportCustomVTable _vtable;
 
@@ -158,17 +158,11 @@ public partial class ExportCustom
 	[UnmanagedCallersOnly(EntryPoint = "ExportCustom_Free", CallConvs = [typeof(CallConvCdecl)])]
 	public static void EXPORT_ExportCustom_Free(IntPtr pThis)
 	{
-		//Console.WriteLine("Free called with pointer: {0}", pThis);
-		if (!PointerToCreatedClass.TryGetValue(pThis, out ExportCustom? exportCustom))
-		{
-			//Console.WriteLine("Class could not found!");
+		Marshal.FreeHGlobal(pThis);
+		if (!PointerToCreatedClass.Remove(pThis, out ExportCustom? exportCustom))
 			return;
-		}
 
 		DestroyExportCustom(ref exportCustom);
-
-		PointerToCreatedClass.Remove(pThis);
-		Marshal.FreeHGlobal(pThis);
 	}
 
 
