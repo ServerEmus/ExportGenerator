@@ -43,7 +43,7 @@ public class VTableTest
 			{
 				var filepath = t.FilePath.Split('\\');
 				var path = filepath[filepath.Length - 1];
-				return path == expectedPairs.Key;
+				return path.Equals(expectedPairs.Key, StringComparison.InvariantCultureIgnoreCase);
 			});
 			string Input = generatedFileSyntax.GetText(TestContext.Current.CancellationToken).ToString().Replace("    ", "\t");
 			string expected = expectedPairs.Value.Replace("    ", "\t");

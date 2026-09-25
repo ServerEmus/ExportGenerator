@@ -25,8 +25,8 @@ public class AttributesGenerator : IIncrementalGenerator
         {
         	public string ExportBaseName { get; } = exportBaseName;
         	public bool ExportPublicMethods { get; } = exportPublicMethods;
-            public bool UseVTable { get; } = useVTable;
-            public CallingConvention Convention { get; } = convention;
+        	public bool UseVTable { get; } = useVTable;
+        	public CallingConvention Convention { get; } = convention;
         }
 
         /// <summary>
