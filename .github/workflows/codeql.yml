@@ -42,7 +42,7 @@ jobs:
 
     - name: Build
       if: matrix.language == 'csharp'
-      run: dotnet build
+      run: dotnet build ExportGenerator/ExportGenerator.csproj
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v4
