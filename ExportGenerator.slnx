@@ -7,7 +7,6 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
   </Folder>
-  <Project Path="ExportGenCppTester/ExportGenCppTester.vcxproj" Id="1c0303aa-7d6f-4e5b-8a3e-4c136cf13f2a" />
   <Project Path="ExportGenerator.Test/ExportGenerator.Test.csproj" />
   <Project Path="ExportGenerator/ExportGenerator.csproj" />
   <Project Path="ExportPlayground/ExportPlayground.csproj">
