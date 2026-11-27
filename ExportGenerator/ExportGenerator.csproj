@@ -16,11 +16,20 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<!-- NuGet -->
 		<IsPackable>true</IsPackable>
-		<Description>Generate DLLExport with special cases.</Description>
-		<Version>1.0</Version>
-		<FileVersion>1.0</FileVersion>
+	</PropertyGroup>
+
+	<!-- Editable properties -->
+	<PropertyGroup>
+		<Title>DLL Export Generator</Title>
+		<Authors>ServerEmus</Authors>
+		<Company>ServerEmus</Company>
+		<Description>Generate DLLExport with special cases</Description>
+		<Copyright>(c) 2026 ServerEmus</Copyright>
+		<PackageProjectUrl>https://github.com/ServerEmus/ExportGenerator</PackageProjectUrl>
+		<Version>1.0.0</Version>
+		<FileVersion>1.0.0</FileVersion>
+		<AssemblyName>ServerEmus.ExportGenerator</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>
