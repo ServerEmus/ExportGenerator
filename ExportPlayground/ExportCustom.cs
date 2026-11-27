@@ -7,6 +7,13 @@ using System.Text;
 
 namespace ExportPlayground;
 
+public enum TestEnum : byte
+{
+	None,
+	Val1,
+	Val2,
+}
+
 // Generate export with all public class, prefixed as "ExportCustom_"
 [ExportGen(nameof(ExportCustom))] 
 public partial class ExportCustom
@@ -59,6 +66,11 @@ public partial class ExportCustom
 	public int GetMagic()
 	{
 		return MagicId;
+	}
+
+	public TestEnum GetEnum()
+	{
+		return TestEnum.Val2;
 	}
 
 	[ExportGenIgnore]
